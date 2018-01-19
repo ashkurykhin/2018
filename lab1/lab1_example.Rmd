@@ -81,7 +81,7 @@ If you are uncertain about what command to use at all, try googling what you wan
 A very good graphing package in R is `ggplot2`. There is an immense number of possible figures one can make using the right commands. A figure is initialized by calling the command `ggplot`, telling it what data to use with the `data` argument. The mapping of data (what is on the x-axis, y-axis, whether we want to split by groups with differently colored lines etc.) can be supplied either directly to the initial `ggplot` command, or to each separate part of the figure The most standard way of supplying this mapping is with the ggplot function `aes` ("aesthetic"), which takes arguments such as `x` and `y`. We can then add plots and other styling using appropriate commands separated by `+`. Here, we use `stat_summary` to generate the average of the y-variable (being open) for each x-value, and tell it to display the result as a bar graph (`geom = 'bar'`). We need to supply the argument `fun.y`, which tells `stat_summary` what statistic to produce, for example `'median'`, `'sd'` (standard deviation) and similar. The commands `xlab` and `ylab` are used to change the labels on the respective axes.
 ```{r}
 ggplot(data = rossmann, mapping = aes(x = storetype, y = open)) +
-  stat_summary(fun.y = 'sd', geom = 'bar') +
+  stat_summary(fun.y = 'mean', geom = 'bar') +
   xlab('Store concept') + ylab("Share of days open")
 ```
 

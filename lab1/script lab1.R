@@ -7,9 +7,10 @@ library(plm)
 setwd("D:/ASUS WebStorage/R Data Folder/ECN431/lab1")
 rossmann <- read.csv('rossmann.csv')
 
-view(rossmann)
+View(rossmann)
 
 count(rossmann, storetype)
+count(rossmann, assortment)
 
 rossmann <- rossmann %>% mutate (
   salest = sales/1000,
@@ -26,6 +27,6 @@ stargazer(salereg_storetype, type = 'text')
 
 ggplot(data = rossmann, mapping = aes(x=storetype, y=open))+stat_summary(fun.y = 'sd', geom='bar')+xlab('Store concept') + ylab('Share of days open')
 
-ggplot(rossmann) + stat_summary(mapping=aes(x=storetype,y=open),fun.y='sd', geom='bar')+labs(x='Store concept',y='Share of days open')
+ggplot(rossmann) + stat_summary(mapping=aes(x=storetype,y=open),fun.y='var', geom='bar')+labs(x='Store concept',y='Share of days open')
 
 
