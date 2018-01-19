@@ -17,9 +17,15 @@ rossmann <- rossmann %>% mutate (
   compdistkm = compdist/1000
 ) 
 
-view(rossmann)
+View(rossmann)
 
 salereg_storetype <- lm(salest ~ storetype, data = rossmann)
 
 summary(salereg_storetype)
 stargazer(salereg_storetype, type = 'text')
+
+ggplot(data = rossmann, mapping = aes(x=storetype, y=open))+stat_summary(fun.y = 'sd', geom='bar')+xlab('Store concept') + ylab('Share of days open')
+
+ggplot(rossmann) + stat_summary(mapping=aes(x=storetype,y=open),fun.y='sd', geom='bar')+labs(x='Store concept',y='Share of days open')
+
+
