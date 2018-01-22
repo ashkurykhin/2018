@@ -8,9 +8,11 @@ setwd("D:/ASUS WebStorage/R Data Folder/ECN431/lab1")
 rossmann <- read.csv('rossmann.csv')
 
 View(rossmann)
+rossmann
 
 count(rossmann, storetype)
 count(rossmann, assortment)
+count(rossmann, stateholiday)
 
 rossmann <- rossmann %>% mutate (
   salest = sales/1000,

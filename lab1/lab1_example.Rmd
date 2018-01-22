@@ -88,7 +88,7 @@ ggplot(data = rossmann, mapping = aes(x = storetype, y = open)) +
 In this case, we could equivalently have supplied the mapping of variables to axes using `aes` to the `stat_summary` command instad. Note also that `ggplot` expects the data as the first argument, such that we do not need to explicitly write `data =`. Instead of the separate commands `xlab` and `ylab`, it can sometimes be more convenient to use the command `labs` which is used to change several labels in the plot.
 ```{r}
 ggplot(rossmann) +
-  stat_summary(mapping = aes(x = storetype, y = open), fun.y = 'sd', geom = 'bar') +
+  stat_summary(mapping = aes(x = storetype, y = open), fun.y = 'mean', geom = 'bar') +
   labs(x = 'Store concept', y = 'Share of days open')
 ```
 
@@ -96,10 +96,17 @@ ggplot(rossmann) +
 Here, we add the indicator variable open to the regression formula. I also illustrate a customization of the stargazer table output by restricting the additional regression statistics to the number of observations and R^2 with the argument `keep.stat` which takes a vector of names of regression statistics to include in the table. In R, we create vectors with `c()` containing a comma-separated list of values. The full list of possible regression statistics can be found in the documentation for stargazer (type or select "stargazer" in the code chunk and hit F1, and find the explanation for the "keep.stat" argument).
 ```{r}
 salereg_storetype_open <- lm(salest ~ storetype + open, data = rossmann)
-stargazer(salereg_storetype_open, type = 'text', keep.stat = c('n', 'rsq'))
+stargazer(salereg_storetype, salereg_storetype_open, type = 'text', keep.stat = c('n', 'rsq'))
 ```
 
 Hint for the second part: formula for omitted variable bias.
+Short equals long plus the effect of omitted times times the regression of omitted on included 
+
+```{r}
+omit_reg <- lm(open~storetype, rossmann)
+stargazer(omit_reg, type='text')
+```
+
 
 
 ## 5.
@@ -120,13 +127,18 @@ rossmann %>% filter(open == 1) %>% group_by(storetype) %>% summarize(avg_open_sa
 
 ## 7.
 Hint: we can use the function `filter` to select rows from a data set where one or more conditions are met.
+```{r}
+rossmann_open <- rossmann %>% filter(open==1)
+salereg_only_open <- lm(salest ~ storetype, rossmann %>% filter(open==1))
+stargazer(salereg_only_open, type='text')
+```
 
 
 ## 8.
 Fill in the correct code for the regressions below. Stargazer can be used to output several regression results in one table.
 ```{r}
-salesreg_comp <- lm
-salesreg_comp_open <- lm
+salesreg_comp <- lm(salest ~ competition, rossmann)
+salesreg_comp_open <- lm(salest ~ competition, rossmann %>% filter(open==1))
 
 stargazer(salesreg_comp, salesreg_comp_open, type = 'text',
           keep.stat = c('n', 'rsq'))
@@ -134,6 +146,12 @@ stargazer(salesreg_comp, salesreg_comp_open, type = 'text',
 
 
 ## 9.
+```{r}
+salesreg_dist <- lm(salest ~ compdistkm, rossmann)
+
+stargazer(salesreg_dist, type = 'text',
+          keep.stat = c('n', 'rsq'))
+```
 
 
 ## 10.
@@ -145,9 +163,9 @@ ggplot(rossmann, mapping = aes(x = year(date), y = competition)) +
 ```
 Fill in the necessary code to make this figure show the average sales for each year:
 ```{r}
-ggplot(rossmann, mapping = aes(x = , y = )) + 
-  +
-  labs(y = 'Average sales', x = 'Year')
+ggplot(rossmann, mapping = aes(x = month(date), y = salest)) + 
+  stat_summary(fun.y='mean', geom='path')+
+  labs(y = 'Average sales in thousands', x = 'Month')
 ```
 
 The following code will create a table with yearly average of sales in thousand and competition. Explain what `group_by` does here. Note that the aggregates we create with `summarize` can be freely named (left-hand side of the equal sign).
@@ -165,12 +183,12 @@ To put both graphs in one figure with separate panels (note that we can "pipe" d
 ```{r}
 rossmann %>% group_by(year(date)) %>% 
   summarize(Competition = mean(competition), Sales = mean(salest)) %>%
-  rename(year = 'year(date)') %>% 
-  gather(key = 'variable', value = 'value', -year) %>% 
-  ggplot(aes(x = year, y = value)) +
+  rename(Year = 'year(date)') %>% 
+  gather(key = 'variable', value = 'value', -Year) %>% 
+  ggplot(aes(x = Year, y = value)) +
   geom_path() + facet_grid(variable ~ ., scales = 'free_y') + 
   scale_x_continuous(breaks = c(2013, 2014, 2015)) +
-  labs(x = 'Year', y = '')
+  labs(x = 'Year', y = 'Average values')
 ```
 
 ## 11.
