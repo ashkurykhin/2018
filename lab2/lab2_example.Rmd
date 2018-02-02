@@ -76,6 +76,9 @@ ggplot(data=fishmarket,aes(x=date,y=quan)) +
 Also plot the price per unit each day by filling in:
 ```{r}
 ggplot(data=fishmarket,aes(x=date,y=price)) +
+  geom_step() +
+    scale_x_date(date_breaks = "1 month") +
+    labs(x="Date",y="Price")
 ```
 
 It might be easier to see how prices and quantities vary together if we place the two plots in one figure, though this requires a bit more effort to get to work "straight out of the box":
@@ -167,9 +170,9 @@ ggplot(data=fishmarket,aes(x=date,y=price)) +
 Fill in to estimate the relevant regression equations and present them in a table using stargazer (tip: use quantity in thousands.
 
 ```{r}
-price_stormy_ols <- 
+price_stormy_ols <- lm(price ~ weather, data=fishmarket)
 
-quan_stormy_ols <- 
+quan_stormy_ols <- lm(quan/1000 ~ weather, data = fishmarket)
 
 stargazer(price_stormy_ols,quan_stormy_ols,
           type="text",
@@ -191,10 +194,10 @@ We begin by estimating the instrumental variables equation as well as the first 
 quan_price_iv <- ivreg(I(quan/1000) ~ price | stormy,
                        data=fishmarket)
 
-quan_price_first <- 
+quan_price_first <- lm(quan/1000 ~ price, data=fishmarket) 
 
 stargazer(quan_price_first,quan_price_iv,
-          type="html",
+          type="text",
           style="aer",
           covariate.labels = c("Stormy Weather","Price"),
           dep.var.labels = c("Price","Quantity"),
@@ -322,7 +325,9 @@ rm(list=ls())
 Load the Nordpool data
 
 ```{r,message=FALSE}
-elmarket <- 
+setwd("D:/ASUS WebStorage/R Data Folder/ECN431/lab2")
+elmarket <- read_csv("elmarket.csv")
+view(elmarket)
 ```
 
 ### Data Wrangling
